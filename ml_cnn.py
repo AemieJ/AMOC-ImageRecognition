@@ -1,8 +1,3 @@
-#ignore all warning
-import warnings
-warnings.simplefilter("ignore")
-
-# creating dictionary for set of objects
 import os
 obj = dict()
 directory = "C:\ObjectCategories"
@@ -61,17 +56,17 @@ train_datagen = ImageDataGenerator(rescale=1./255,
 test_datagen  =  ImageDataGenerator(rescale= 1./255)
 
 #Creating the training and test set
-training_set = train_datagen.flow_from_directory("C:/ml_project/ObjectCategories_sets/training_set",
+training_set = train_datagen.flow_from_directory("C:/ml_project/ObjectCategories_sets/TrainingSet",
                                                  target_size=(64,64),
                                                  batch_size= 32 ,
                                                  class_mode="binary")
-test_set = test_datagen.flow_from_directory("C:/ml_project/ObjectCategories_sets/test_set",
+test_set = test_datagen.flow_from_directory("C:/ml_project/ObjectCategories_sets/TestSet",
                                             target_size=(64,64),
                                             batch_size=32 ,
                                             class_mode="binary")
 #Fitting the images to our CNN network created
 
-classifier.fit_generator(training_set ,
+history=classifier.fit_generator(training_set ,
                          steps_per_epoch=250 ,
                          epochs=25 ,
                          validation_data = test_set ,
@@ -87,16 +82,26 @@ test_image = image.img_to_array(test_image) #64x64
 test_image= np.expand_dims(test_image,axis=0) #64x64x1
 result = classifier.predict_classes(test_image)
 training_set.class_indices
+ 
+for name , number in training_set.class_indices.items() : 
+    if number == int(result) : 
+        print(name)
 
 
-
-
-
-
-
-
-
-
-
-
-
+import matplotlib as plt 
+# summarize history for accuracy
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+# summarize history for loss
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
